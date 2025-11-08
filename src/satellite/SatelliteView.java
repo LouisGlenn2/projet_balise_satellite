@@ -1,21 +1,21 @@
-package Mobi;
+package satellite;
 
 import java.awt.Color;
 
 import src.nicellipse.component.NiRectangle;
 
-public class MobiView extends NiRectangle implements MobilListener{
+public class SatelliteView extends NiRectangle implements SatelliteListener{
 
-	private Mobi mobi;
+	private Satellite mobi;
 	
-	public MobiView(Mobi mobi) {
+	public SatelliteView(Satellite mobi) {
 		this.mobi = mobi;
 		this.setBackground(Color.red);
 	}
 	
 	@Override
-	public void MobilMoveEvent(MobiMoveEvent event) {
-		Mobi source = (Mobi) event.getSource();
+	public void MobilMoveEvent(SatelliteMoveEvent event) {
+		Satellite source = (Satellite) event.getSource();
 		int x = source.getX();
 		int y = source.getY();
 		
@@ -29,7 +29,7 @@ public class MobiView extends NiRectangle implements MobilListener{
 	}
 
 	@Override
-	public void MobiHandCheckRequestEvent(MobiMoveEvent event) {
+	public void MobiHandCheckRequestEvent(SatelliteMoveEvent event) {
 		// TODO Auto-generated method stub
 		
 	}
