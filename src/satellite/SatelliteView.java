@@ -2,7 +2,9 @@ package satellite;
 
 import java.awt.Color;
 
+import observer.*;
 import src.nicellipse.component.NiRectangle;
+
 
 public class SatelliteView extends NiRectangle implements SatelliteListener{
 
@@ -26,5 +28,10 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 		x = ((x % maxX) + maxX) % maxX;
 		
 		this.setLocation(x, y);
+	}
+	@Override
+	public void SattelliteSynchroEvent(SatelliteSynchroEvent event) {
+		//Circle.setvisible(true);
+		
 	}
 }

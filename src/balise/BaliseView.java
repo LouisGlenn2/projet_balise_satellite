@@ -27,4 +27,11 @@ public class BaliseView extends NiRectangle implements BaliseListener {
     public Balise getBalise() {
         return balise;
     }
+
+	@Override
+	public void SynchroBalise(BaliseSynchroEvent event) {
+		 Balise source = (Balise) event.getSource();
+		 //Circle.setvisible(true);
+		
+	}
 }

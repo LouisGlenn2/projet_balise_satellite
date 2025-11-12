@@ -1,5 +1,0 @@
-package satellite;
-
-public interface SatelliteListener {
-	public void SatelliteMoveEvent(SatelliteMoveEvent event);
-}
