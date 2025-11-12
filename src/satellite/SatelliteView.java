@@ -14,7 +14,7 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 	}
 	
 	@Override
-	public void MobilMoveEvent(SatelliteMoveEvent event) {
+	public void SatelliteMoveEvent(SatelliteMoveEvent event) {
 		Satellite source = (Satellite) event.getSource();
 		int x = source.getX();
 		int y = source.getY();
@@ -26,11 +26,5 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 		x = ((x % maxX) + maxX) % maxX;
 		
 		this.setLocation(x, y);
-	}
-
-	@Override
-	public void MobiHandCheckRequestEvent(SatelliteMoveEvent event) {
-		// TODO Auto-generated method stub
-		
 	}
 }

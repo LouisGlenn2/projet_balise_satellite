@@ -1,12 +1,14 @@
-package balise;
+package strategy;
 
-public class VerticalHautStrategy implements MoveStrategy {
+import balise.Balise;
+
+public class VerticalDownStrategy implements MoveStrategy {
     private int xFixe;
     private int vitesseY;
-    private int profondeurMin;
+    private int profondeurMin;  
     private int profondeurMax;
     
-    public VerticalHautStrategy(int xFixe, int vitesseY, int profondeurMin, int profondeurMax) {
+    public VerticalDownStrategy(int xFixe, int vitesseY, int profondeurMin, int profondeurMax) {
         this.xFixe = xFixe;
         this.vitesseY = Math.abs(vitesseY);
         this.profondeurMin = Math.max(400, profondeurMin);
@@ -17,11 +19,11 @@ public class VerticalHautStrategy implements MoveStrategy {
     public void move(Balise balise) {
         balise.setX(xFixe);
         
-        int newY = balise.getY() - (vitesseY * balise.getDirection());
-        
-        if (newY <= profondeurMin || newY >= profondeurMax) {
+        int newY = balise.getY() + (vitesseY * balise.getDirection());
+
+        if (newY >= profondeurMax || newY <= profondeurMin) {
             balise.setDirection(balise.getDirection() * -1);
-            newY = balise.getY() - (vitesseY * balise.getDirection());
+            newY = balise.getY() + (vitesseY * balise.getDirection());
         }
         
         balise.setY(newY);

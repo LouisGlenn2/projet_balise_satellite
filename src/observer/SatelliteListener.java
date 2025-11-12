@@ -1,4 +1,4 @@
-package satellite;
+package observer;
 
 public interface SatelliteListener {
 	public void SatelliteMoveEvent(SatelliteMoveEvent event);

@@ -1,6 +1,8 @@
 package balise;
 
 import announcer.Announcer;
+import strategy.*;
+import observer.*;
 
 public class Balise {
     private int x, y;

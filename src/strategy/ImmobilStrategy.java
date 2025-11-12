@@ -1,10 +1,12 @@
-package balise;
+package strategy;
 
-public class ImmobileStrategy implements MoveStrategy {
+import balise.Balise;
+
+public class ImmobilStrategy implements MoveStrategy {
     private int xFixe;
     private int yFixe;
     
-    public ImmobileStrategy(int xFixe, int yFixe) {
+    public ImmobilStrategy(int xFixe, int yFixe) {
         this.xFixe = xFixe;
         this.yFixe = Math.max(400, yFixe); 
     }

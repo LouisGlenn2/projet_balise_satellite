@@ -1,4 +1,4 @@
-package announcer;
+ package announcer;
 import java.util.EventObject;
 
 public abstract class AbstractEvent extends EventObject {

@@ -1,6 +1,7 @@
-package balise;
+package observer;
 
 import announcer.AbstractEvent;
+import observer.BaliseListener;
 
 public class BaliseMoveEvent extends AbstractEvent {
     private static final long serialVersionUID = 1L;
@@ -14,3 +15,4 @@ public class BaliseMoveEvent extends AbstractEvent {
         ((BaliseListener) target).onBaliseMove(this);
     }
 }
+

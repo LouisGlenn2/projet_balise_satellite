@@ -1,12 +1,14 @@
-package balise;
+package strategy;
 
-public class HorizontalDroiteStrategy implements MoveStrategy {
+import balise.Balise;
+
+public class HorizontalRightStrategy implements MoveStrategy {
     private int profondeurFixe;
     private int vitesseX;
     private int limiteGauche;
     private int limiteDroite;
     
-    public HorizontalDroiteStrategy(int profondeurFixe, int vitesseX, int limiteGauche, int limiteDroite) {
+    public HorizontalRightStrategy(int profondeurFixe, int vitesseX, int limiteGauche, int limiteDroite) {
         this.profondeurFixe = Math.max(400, profondeurFixe);
         this.vitesseX = Math.abs(vitesseX);
         this.limiteGauche = limiteGauche;

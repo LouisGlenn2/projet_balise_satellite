@@ -1,4 +1,6 @@
-package balise;
+package strategy;
+
+import balise.Balise;
 
 public class SinusoidalStrategy implements MoveStrategy {
     private int vitesseX;       

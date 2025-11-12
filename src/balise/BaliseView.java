@@ -2,6 +2,7 @@ package balise;
 
 import java.awt.Color;
 import src.nicellipse.component.NiRectangle;
+import observer.*;
 
 public class BaliseView extends NiRectangle implements BaliseListener {
     private Balise balise;

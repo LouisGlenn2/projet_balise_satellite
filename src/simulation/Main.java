@@ -1,14 +1,16 @@
-package satellite;
+package simulation;
 
 import java.awt.Color;
 import java.awt.Dimension;
 
 import balise.*;
 import strategy.*;
+import satellite.*;
+
 import src.nicellipse.component.NiRectangle;
 import src.nicellipse.component.NiSpace;
 
-public class SatelliteMain {
+public class Main {
     
     public static void main(String[] args) throws InterruptedException {
         int LARGEUR_FENETRE = 600;
