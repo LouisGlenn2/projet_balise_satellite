@@ -22,11 +22,11 @@ public class Satellite {
 	    this.synchroCounter = 0;
 	}
 	
-	public void move(int gap) {
+	/*public void move(int gap) {
 		this.x = this.x + (direction*gap);
 		announcer.announce(new SatelliteMoveEvent(this));
-	}
-	/* // --- Déplacement ---
+	}*/
+	 // --- Déplacement ---
     public void move(int gap) {
         if (state == SatelliteState.Libre) {
             this.x = this.x + (direction * gap);
@@ -38,13 +38,9 @@ public class Satellite {
                 // fin synchro → retour à Libre
                 this.state = SatelliteState.Libre;
                 synchroCounter = 0;
-
-                // nouvelle durée aléatoire pour la prochaine synchro
-                Random rand = new Random();
-                this.synchroDuration = 20 + rand.nextInt(41);
             }
         }
-    }*/
+    }
 	
     public void announceSynchro() {
         announcer.announce(new SatelliteSynchroEvent(this));

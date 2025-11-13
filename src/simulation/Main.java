@@ -87,7 +87,16 @@ public class Main {
             balise3.deplacer();
             balise4.deplacer();
             balise5.deplacer();
-            
+            balise1.trySynchronize(satellite1);
+            balise1.trySynchronize(satellite2);
+            balise2.trySynchronize(satellite1);
+            balise2.trySynchronize(satellite2);
+            balise3.trySynchronize(satellite1);
+            balise3.trySynchronize(satellite2);
+            balise4.trySynchronize(satellite1);
+            balise4.trySynchronize(satellite2);
+            balise5.trySynchronize(satellite1);
+            balise5.trySynchronize(satellite2);
             Thread.sleep(20);
         }
     }

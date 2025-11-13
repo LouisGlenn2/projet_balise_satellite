@@ -22,16 +22,34 @@ public class BaliseView extends NiRectangle implements BaliseListener {
         int y = source.getY();
         
         this.setLocation(x, y);
+        updateColor();
     }
     
     public Balise getBalise() {
         return balise;
+    }
+    private void updateColor() {
+        switch (balise.getState()) {
+            case Collect:
+                this.setBackground(Color.YELLOW);
+                break;
+            case WaitSynchro:
+                this.setBackground(Color.ORANGE);
+                break;
+            case Synchro:
+                this.setBackground(Color.GREEN);
+                break;
+            case redescente:
+                this.setBackground(Color.CYAN);
+                break;
+        }
     }
 
 	@Override
 	public void SynchroBalise(BaliseSynchroEvent event) {
 		 Balise source = (Balise) event.getSource();
 		 //Circle.setvisible(true);
+		 updateColor();
 		
 	}
 }

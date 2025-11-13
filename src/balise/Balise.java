@@ -5,6 +5,8 @@ import java.util.Random;
 import announcer.Announcer;
 import strategy.*;
 import observer.*;
+import satellite.Satellite;
+import satellite.SatelliteState;
 
 public class Balise {
     private int x, y;
@@ -32,13 +34,13 @@ public class Balise {
         this.moveStrategy = strategy;
     }
 
-    public void deplacer() {
+    	/*public void deplacer() {
         if (moveStrategy != null) {
             moveStrategy.move(this);
             announcer.announce(new BaliseMoveEvent(this));
         }
-    }
-    /* public void deplacer() {
+    }*/
+     public void deplacer() {
         if (state == BaliseState.Collect && moveStrategy != null) {
             moveStrategy.move(this);
             announcer.announce(new BaliseMoveEvent(this));
@@ -50,7 +52,7 @@ public class Balise {
                 this.y = 400; // remonte en surface
                 announcer.announce(new BaliseMoveEvent(this));
             }
-        } else if (state == BaliseState.Redescente) {
+        } else if (state == BaliseState.redescente) {
             this.y = 600;
             this.state = BaliseState.Collect;
             memory = 0;
@@ -66,7 +68,7 @@ public class Balise {
     public void trySynchronize(Satellite sat) {
         if (this.state == BaliseState.WaitSynchro 
             && sat.getState() == SatelliteState.Libre 
-            && Math.abs(this.x - sat.getX()) < 10) {
+            && Math.abs(this.x - sat.getX()) < 100) {
 
             this.state = BaliseState.Synchro;
             announcer.announce(new BaliseSynchroEvent(this));
@@ -77,12 +79,13 @@ public class Balise {
             endSynchronization(sat);
         }
     }
+    
 
     private void endSynchronization(Satellite sat) {
-        this.state = BaliseState.Redescente;
+        this.state = BaliseState.redescente;
         announcer.announce(new BaliseMoveEvent(this));
         sat.setState(SatelliteState.Libre);
-    }*/
+    }
 
     public void registerMoveEvent(Object observer) {
         this.announcer.register(observer, BaliseMoveEvent.class);

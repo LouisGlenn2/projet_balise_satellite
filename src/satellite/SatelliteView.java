@@ -9,7 +9,7 @@ import src.nicellipse.component.NiRectangle;
 public class SatelliteView extends NiRectangle implements SatelliteListener{
 
 	private Satellite mobi;
-	
+
 	public SatelliteView(Satellite mobi) {
 		this.mobi = mobi;
 		this.setBackground(Color.red);
@@ -28,10 +28,25 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 		x = ((x % maxX) + maxX) % maxX;
 		
 		this.setLocation(x, y);
+		updateColor();
 	}
 	@Override
 	public void SattelliteSynchroEvent(SatelliteSynchroEvent event) {
 		//Circle.setvisible(true);
+		updateColor();
 		
 	}
+	
+	private void updateColor() {
+        switch (mobi.getState()) {
+            case Libre:
+                this.setBackground(Color.RED);
+                
+                break;
+            case Synchro:
+                this.setBackground(Color.BLUE);
+                
+                break;
+        }
+    }
 }
