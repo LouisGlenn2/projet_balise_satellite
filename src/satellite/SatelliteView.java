@@ -26,7 +26,7 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 		int maxX = pw - w;
 		
 		x = ((x % maxX) + maxX) % maxX;
-		
+		mobi.setX(x);
 		this.setLocation(x, y);
 		updateColor();
 	}
@@ -34,6 +34,7 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 	public void SattelliteSynchroEvent(SatelliteSynchroEvent event) {
 		//Circle.setvisible(true);
 		updateColor();
+		
 		
 	}
 	

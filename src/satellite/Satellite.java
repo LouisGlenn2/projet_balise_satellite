@@ -19,7 +19,7 @@ public class Satellite {
 		this.direction = direction;
 		this.announcer = new Announcer();
 		this.state=SatelliteState.Libre;
-		this.synchroDuration = 20;
+		this.synchroDuration = 20000;
 	    this.synchroCounter = 0;
 	}
 	

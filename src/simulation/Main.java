@@ -2,6 +2,8 @@ package simulation;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.Arrays;
+import java.util.List;
 
 import balise.*;
 import strategy.*;
@@ -85,26 +87,20 @@ public class Main {
         
         space.openInWindow();
         
-        while(true) {
+        List<Balise> balises = Arrays.asList(balise1, balise2, balise3, balise4, balise5);
+        List<Satellite> satellites = Arrays.asList(satellite1, satellite2);
+
+        while (true) {
             satellite1.move(3);
-            satellite2.move(5);
-     
-            balise1.deplacer();
-            balise2.deplacer();
-            balise3.deplacer();
-            balise4.deplacer();
-            balise5.deplacer();
-            balise1.trySynchronize(satellite1);
-            balise1.trySynchronize(satellite2);
-            balise2.trySynchronize(satellite1);
-            balise2.trySynchronize(satellite1);
-            balise3.trySynchronize(satellite1);
-            balise3.trySynchronize(satellite1);
-            balise4.trySynchronize(satellite1);
-            balise4.trySynchronize(satellite2);
-            balise5.trySynchronize(satellite1);
-            balise5.trySynchronize(satellite1);
-            
+            satellite2.move(2);
+
+            for (Balise b : balises) {
+                b.deplacer();
+                for (Satellite s : satellites) {
+                    b.trySynchronize(s);
+                }
+            }
+
             Thread.sleep(20);
         }
     }

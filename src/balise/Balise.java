@@ -26,13 +26,14 @@ public class Balise {
         this.announcer = new Announcer();
         this.state = BaliseState.Collect;
         this.memory = 0;
-        
+       
         Random rand = new Random();
-        this.maxMemory = 30 + rand.nextInt(71); 
+        this.maxMemory = 530 + rand.nextInt(71); 
     }
 
     public void setMoveStrategy(MoveStrategy strategy) {
         this.moveStrategy = strategy;
+        this.savedStrategy=strategy;
     }
 
     public void deplacer() {
@@ -83,10 +84,7 @@ public class Balise {
      * Démarre la phase de remontée
      */
     private void startRemontee() {
-        this.state = BaliseState.Remontee;
-
-        this.savedStrategy = this.moveStrategy;
-        
+        this.state = BaliseState.Remontee;       
         this.moveStrategy = new VerticalUpStrategy(this.x,3,400,this.y );
         this.direction = 1; 
         
@@ -109,7 +107,7 @@ public class Balise {
      * Tente une synchronisation avec un satellite
      */
     public void trySynchronize(Satellite sat) {
-        if (this.state == BaliseState.WaitSynchro && sat.getState() == SatelliteState.Libre && Math.abs(this.x - sat.getX()) < 20) {
+        if (this.state == BaliseState.WaitSynchro && sat.getState() == SatelliteState.Libre && Math.abs(this.x - sat.getX()) < 60) {
             
             System.out.println("Synchro " + this.getNom() + " <-> " + sat.getNom());
             
@@ -152,10 +150,11 @@ public class Balise {
         // Reprendre la collecte
         this.state = BaliseState.Collect;
         this.memory = 0;
+        this.moveStrategy= this.savedStrategy;
 
         // Nouveau seuil aléatoire pour la prochaine collecte
         Random rand = new Random();
-        this.maxMemory = 30 + rand.nextInt(71);
+        this.maxMemory = 530 + rand.nextInt(71);
 
         announcer.announce(new BaliseMoveEvent(this));
     }
