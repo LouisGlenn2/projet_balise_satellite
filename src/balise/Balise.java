@@ -12,19 +12,20 @@ public class Balise {
     private int x, y;
     private int direction;
     private MoveStrategy moveStrategy;
+    private MoveStrategy savedStrategy; // Pour sauvegarder la stratégie de collecte
     private Announcer announcer;
     private BaliseState state;
     private int memory;
     private int maxMemory; 
-    
+    private String nom;
     
     public Balise(int x, int y, int direction) {
         this.x = x;
         this.y = Math.max(400, y);
         this.direction = direction;
         this.announcer = new Announcer();
-        this.state=BaliseState.Collect;
-        this.memory=0;
+        this.state = BaliseState.Collect;
+        this.memory = 0;
         
         Random rand = new Random();
         this.maxMemory = 30 + rand.nextInt(71); 
@@ -34,57 +35,129 @@ public class Balise {
         this.moveStrategy = strategy;
     }
 
-    	/*public void deplacer() {
-        if (moveStrategy != null) {
-            moveStrategy.move(this);
-            announcer.announce(new BaliseMoveEvent(this));
-        }
-    }*/
-     public void deplacer() {
+    public void deplacer() {
         if (state == BaliseState.Collect && moveStrategy != null) {
+            // Phase de collecte normale
             moveStrategy.move(this);
             announcer.announce(new BaliseMoveEvent(this));
             memory++;
 
-            // Quand la mémoire atteint le max → passage en attente synchro
+            // Quand la mémoire atteint le max → début de la remontée
             if (memory >= maxMemory) {
-                this.state = BaliseState.WaitSynchro;
-                this.y = 400; // remonte en surface
+                startRemontee();
+                System.out.println("Collecte Fini montée");
+            }
+        } 
+        else if (state == BaliseState.Remontee) {
+            // Phase de remontée vers la surface
+            moveStrategy.move(this);
+            announcer.announce(new BaliseMoveEvent(this));
+
+            // Vérifier si arrivée en surface
+            if (this.y <= 405) {
+                arriveeSurface();
+            }
+        }
+        else if (state == BaliseState.WaitSynchro) {
+            // En attente immobile - appliquer quand même la stratégie pour rester immobile
+            if (moveStrategy != null) {
+                moveStrategy.move(this);
                 announcer.announce(new BaliseMoveEvent(this));
             }
-        } else if (state == BaliseState.redescente) {
-            this.y = 600;
-            this.state = BaliseState.Collect;
-            memory = 0;
-
-            // Nouveau seuil aléatoire pour la prochaine collecte
-            Random rand = new Random();
-            this.maxMemory = 30 + rand.nextInt(71);
-
-            announcer.announce(new BaliseMoveEvent(this));
+        }
+        else if (state == BaliseState.Synchro) {
+            // En cours de synchro - rester immobile
+            if (moveStrategy != null) {
+                moveStrategy.move(this);
+                announcer.announce(new BaliseMoveEvent(this));
+            }
+        }
+        else if (state == BaliseState.redescente) {
+            // Phase de redescente après synchronisation
+            System.out.println("Synchro Fini redescente");
+            redescendre();
         }
     }
 
-    public void trySynchronize(Satellite sat) {
-        if (this.state == BaliseState.WaitSynchro 
-            && sat.getState() == SatelliteState.Libre 
-            && Math.abs(this.x - sat.getX()) < 100) {
+    /**
+     * Démarre la phase de remontée
+     */
+    private void startRemontee() {
+        this.state = BaliseState.Remontee;
 
+        this.savedStrategy = this.moveStrategy;
+        
+        this.moveStrategy = new VerticalUpStrategy(this.x,3,400,this.y );
+        this.direction = 1; 
+        
+        announcer.announce(new BaliseMoveEvent(this));
+    }
+
+    /**
+     * Appelée quand la balise arrive en surface
+     */
+    private void arriveeSurface() {
+        this.y = 400; 
+        this.state = BaliseState.WaitSynchro;
+        
+        this.moveStrategy = new ImmobilStrategy(this.x, 400);
+        
+        announcer.announce(new BaliseMoveEvent(this));
+    }
+
+    /**
+     * Tente une synchronisation avec un satellite
+     */
+    public void trySynchronize(Satellite sat) {
+        if (this.state == BaliseState.WaitSynchro && sat.getState() == SatelliteState.Libre && Math.abs(this.x - sat.getX()) < 20) {
+            
+            System.out.println("Synchro " + this.getNom() + " <-> " + sat.getNom());
+            
             this.state = BaliseState.Synchro;
             announcer.announce(new BaliseSynchroEvent(this));
 
             sat.setState(SatelliteState.Synchro);
             sat.announceSynchro();
-
+            
             endSynchronization(sat);
         }
     }
     
-
+    /**
+     * Termine la synchronisation et prépare la redescente
+     */
     private void endSynchronization(Satellite sat) {
         this.state = BaliseState.redescente;
-        announcer.announce(new BaliseMoveEvent(this));
         sat.setState(SatelliteState.Libre);
+    }
+
+    /**
+     * Redescend et reprend la collecte
+     */
+    private void redescendre() {
+        // Restaurer la stratégie de collecte sauvegardée
+        if (savedStrategy != null) {
+            Random rand = new Random();
+            int profondeur = 450 + rand.nextInt(351);
+            this.moveStrategy = new VerticalDownStrategy(this.x, 3, 1, profondeur);
+            announcer.announce(new BaliseMoveEvent(this));
+        }
+        
+        // Réinitialiser la profondeur (selon la stratégie)
+        // On force un déplacement pour repositionner correctement
+        if (moveStrategy != null) {
+            moveStrategy.move(this);
+        }
+        
+        // Reprendre la collecte
+        this.state = BaliseState.Collect;
+        this.memory = 0;
+
+        // Nouveau seuil aléatoire pour la prochaine collecte
+        Random rand = new Random();
+        this.maxMemory = 30 + rand.nextInt(71);
+
+        announcer.announce(new BaliseMoveEvent(this));
     }
 
     public void registerMoveEvent(Object observer) {
@@ -92,7 +165,6 @@ public class Balise {
         this.announcer.register(observer, BaliseSynchroEvent.class);
     }
     
-   
     public void setLocation(int x, int y) {
         this.x = x;
         this.y = Math.max(400, y); 
@@ -125,13 +197,24 @@ public class Balise {
     public MoveStrategy getMoveStrategy() {
         return moveStrategy;
     }
+    
     public BaliseState getState() {
-    	return state; 
+        return state; 
     }
+    
     public int getMemory() { 
-    	return memory;
+        return memory;
     }
+    
     public int getMaxMemory() { 
-    	return maxMemory; 
+        return maxMemory; 
+    }
+
+    public void setNom(String n){
+        this.nom = n; 
+    }
+
+    public String getNom(){
+        return nom;
     }
 }

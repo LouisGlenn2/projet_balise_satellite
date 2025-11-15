@@ -30,41 +30,48 @@ public class Main {
         BaliseView baliseView1 = new BaliseView(balise1);
         balise1.registerMoveEvent(baliseView1);
         balise1.setMoveStrategy(new HorizontalRightStrategy(500, 3, 0, LARGEUR_FENETRE));
-        
+        balise1.setNom("Atalante");
+
         // Balise 2 : Déplacement vertical (démarre en montant, direction=1)
         Balise balise2 = new Balise(200, 550, 1);
         BaliseView baliseView2 = new BaliseView(balise2);
         balise2.registerMoveEvent(baliseView2);
         balise2.setMoveStrategy(new VerticalUpStrategy(200, 3, 400, 700));
-        
+        balise2.setNom("Le Terrible");
+
         // Balise 3 : Déplacement sinusoïdal
         Balise balise3 = new Balise(50, 550, 1);
         BaliseView baliseView3 = new BaliseView(balise3);
         balise3.registerMoveEvent(baliseView3);
         balise3.setMoveStrategy(new SinusoidalStrategy(2, 80, 550, 0.05, 0, LARGEUR_FENETRE));
-        
+        balise3.setNom("Pourquoi pas ?");
+
         // Balise 4 : Immobile 
         Balise balise4 = new Balise(450, 600, 1);
         BaliseView baliseView4 = new BaliseView(balise4);
         balise4.registerMoveEvent(baliseView4);
         balise4.setMoveStrategy(new ImmobilStrategy(450, 600));
-        
+        balise4.setNom("La Bretagne");
+
         // Balise 5 : Déplacement horizontal (démarre vers la gauche, direction=-1)
         Balise balise5 = new Balise(550, 650, -1);
         BaliseView baliseView5 = new BaliseView(balise5);
         balise5.registerMoveEvent(baliseView5);
         balise5.setMoveStrategy(new HorizontalLeftStrategy(650, 2, 0, LARGEUR_FENETRE));
-        
+        balise5.setNom("Tonerre");
+
         // ===== SATELLITES =====
         
         Satellite satellite1 = new Satellite(20, 20, 1);
         SatelliteView satelliteView1 = new SatelliteView(satellite1);
         satellite1.registerMoveEvent(satelliteView1);
-        
+        satellite1.setNom("Apollo");
+
         Satellite satellite2 = new Satellite(20, 60, -1);
         SatelliteView satelliteView2 = new SatelliteView(satellite2);
         satellite2.registerMoveEvent(satelliteView2);
-        
+        satellite2.setNom("Saturne");
+
         space.add(satelliteView1);
         space.add(satelliteView2);
         
@@ -90,13 +97,14 @@ public class Main {
             balise1.trySynchronize(satellite1);
             balise1.trySynchronize(satellite2);
             balise2.trySynchronize(satellite1);
-            balise2.trySynchronize(satellite2);
+            balise2.trySynchronize(satellite1);
             balise3.trySynchronize(satellite1);
-            balise3.trySynchronize(satellite2);
+            balise3.trySynchronize(satellite1);
             balise4.trySynchronize(satellite1);
             balise4.trySynchronize(satellite2);
             balise5.trySynchronize(satellite1);
-            balise5.trySynchronize(satellite2);
+            balise5.trySynchronize(satellite1);
+            
             Thread.sleep(20);
         }
     }

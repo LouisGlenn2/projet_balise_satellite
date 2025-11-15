@@ -11,7 +11,8 @@ public class Satellite {
 	private SatelliteState state;
     private int synchroDuration;   
     private int synchroCounter;    
-	
+	private String nom;
+
 	public Satellite (int x, int y, int direction) {
 		this.x = x;
 		this.y = y;
@@ -82,6 +83,12 @@ public class Satellite {
 	public void setState(SatelliteState state) { 
 		this.state = state;
 	}
-
 	
+    public String getNom(){
+        return nom;
+    }
+
+    public void setNom(String n){
+        this.nom = n;
+    }
 }
