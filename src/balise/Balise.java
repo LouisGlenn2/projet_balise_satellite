@@ -9,7 +9,7 @@ import strategy.*;
 
 public class Balise {
     private int x, y;
-    private int direction;
+    private int direction,profondeurOrigine;
     private MoveStrategy moveStrategy;
     private MoveStrategy savedStrategy; // Pour sauvegarder la stratégie de collecte
     private Announcer announcer;
@@ -25,9 +25,10 @@ public class Balise {
         this.announcer = new Announcer();
         this.state = BaliseState.Collect;
         this.memory = 0;
+        this.profondeurOrigine=this.y;
        
         Random rand = new Random();
-        this.maxMemory = 530 + rand.nextInt(71); 
+        this.maxMemory = 50 + rand.nextInt(171); 
     }
 
     public void setMoveStrategy(MoveStrategy strategy) {
@@ -135,28 +136,24 @@ public class Balise {
         // Restaurer la stratégie de collecte sauvegardée
         if (savedStrategy != null) {
             Random rand = new Random();
-            int profondeur = 450 + rand.nextInt(351);
-            this.moveStrategy = new VerticalDownStrategy(this.x, 3, 1, profondeur);
+            this.moveStrategy = new VerticalDownStrategy(this.x, 3, 1, profondeurOrigine+10);
+            moveStrategy.move(this);
             announcer.announce(new BaliseMoveEvent(this));
         }
         
-        // Réinitialiser la profondeur (selon la stratégie)
-        // On force un déplacement pour repositionner correctement
-        if (moveStrategy != null) {
-            moveStrategy.move(this);
-        }
-        
+        if(this.y >= this.profondeurOrigine) {
         // Reprendre la collecte
         this.state = BaliseState.Collect;
         this.memory = 0;
-        System.out.println(this.y);
-        //this.moveStrategy= this.savedStrategy;
+        System.out.println(this.y); 
+        this.moveStrategy= this.savedStrategy;
 
         // Nouveau seuil aléatoire pour la prochaine collecte
         Random rand = new Random();
         this.maxMemory = 130 + rand.nextInt(71);
 
         announcer.announce(new BaliseMoveEvent(this));
+        }
     }
 
     public void registerMoveEvent(Object observer) {

@@ -1,17 +1,52 @@
 package balise;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import src.nicellipse.component.NiRectangle;
+import src.nicellipse.component.NiImage;
 import observer.*;
 
+
 public class BaliseView extends NiRectangle implements BaliseListener {
-    private Balise balise;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Balise balise;
+	 private NiImage imageLayer;
     
-    public BaliseView(Balise balise) {
+    public BaliseView(Balise balise) throws IOException {
         this.balise = balise;
-        this.setBackground(Color.YELLOW);
-        this.setSize(20, 20);
+        this.setBorder(null);
+        
+        // Charger l'image comme dans ton exemple GrBalise
+        File path = new File("src/ressources/balise.png");
+        BufferedImage rawImage = null;
+        try {
+            rawImage = ImageIO.read(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Ajouter l'image par-dessus le rectangle
+        if (rawImage != null) {
+            imageLayer = new NiImage(rawImage);
+            imageLayer.setLocation(0, 0);
+            this.add(imageLayer);
+
+            // Dimensionner le composant selon l'image
+            this.setDimension(new Dimension(rawImage.getWidth(), rawImage.getHeight()));
+        }
+
+        // Position initiale
         this.setLocation(balise.getX(), balise.getY());
+      
     }
 
     @Override
@@ -35,7 +70,8 @@ public class BaliseView extends NiRectangle implements BaliseListener {
         switch (balise.getState()) {
             case Collect:
                 // Jaune pendant la collecte
-                this.setBackground(Color.YELLOW);
+            	this.setOpaque(false);
+                this.setBackground(new Color(0, 0, 0, 0));
                 break;
             case Remontee:
                 // Bleu clair pendant la remontée
@@ -61,4 +97,5 @@ public class BaliseView extends NiRectangle implements BaliseListener {
         Balise source = (Balise) event.getSource();
         updateColor();
     }
+    
 }

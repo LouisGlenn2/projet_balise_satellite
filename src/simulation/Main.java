@@ -2,6 +2,7 @@ package simulation;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import src.nicellipse.component.NiSpace;
 
 public class Main {
     
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         int LARGEUR_FENETRE = 600;
         int SURFACE_MER = 400;
         
@@ -31,7 +32,7 @@ public class Main {
         Balise balise1 = new Balise(50, 500, 1);
         BaliseView baliseView1 = new BaliseView(balise1);
         balise1.registerMoveEvent(baliseView1);
-        balise1.setMoveStrategy(new HorizontalRightStrategy(500, 3, 0, LARGEUR_FENETRE));
+        balise1.setMoveStrategy(new HorizontalRightStrategy(balise1.getY(), 3, 0, LARGEUR_FENETRE));
         balise1.setNom("Atalante");
 
         // Balise 2 : Déplacement vertical (démarre en montant, direction=1)
@@ -45,21 +46,21 @@ public class Main {
         Balise balise3 = new Balise(50, 550, 1);
         BaliseView baliseView3 = new BaliseView(balise3);
         balise3.registerMoveEvent(baliseView3);
-        balise3.setMoveStrategy(new SinusoidalStrategy(2, 80, 550, 0.05, 0, LARGEUR_FENETRE));
+        balise3.setMoveStrategy(new SinusoidalStrategy(2, 80, balise3.getY(), 0.05, 0, LARGEUR_FENETRE));
         balise3.setNom("Pourquoi pas ?");
 
         // Balise 4 : Immobile 
         Balise balise4 = new Balise(450, 600, 1);
         BaliseView baliseView4 = new BaliseView(balise4);
         balise4.registerMoveEvent(baliseView4);
-        balise4.setMoveStrategy(new SinusoidalStrategy(2, 20, 650, 0.45, 0, LARGEUR_FENETRE));
+        balise4.setMoveStrategy(new SinusoidalStrategy(2, 20, balise4.getY(), 0.45, 0, LARGEUR_FENETRE));
         balise4.setNom("La Bretagne");
 
         // Balise 5 : Déplacement horizontal (démarre vers la gauche, direction=-1)
         Balise balise5 = new Balise(550, 650, -1);
         BaliseView baliseView5 = new BaliseView(balise5);
         balise5.registerMoveEvent(baliseView5);
-        balise5.setMoveStrategy(new HorizontalLeftStrategy(650, 2, 0, LARGEUR_FENETRE));
+        balise5.setMoveStrategy(new HorizontalLeftStrategy(balise5.getY(), 2, 0, LARGEUR_FENETRE));
         balise5.setNom("Tonerre");
 
         // ===== SATELLITES =====
