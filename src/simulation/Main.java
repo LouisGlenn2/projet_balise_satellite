@@ -52,7 +52,7 @@ public class Main {
         Balise balise4 = new Balise(450, 600, 1);
         BaliseView baliseView4 = new BaliseView(balise4);
         balise4.registerMoveEvent(baliseView4);
-        balise4.setMoveStrategy(new ImmobilStrategy(450, 600));
+        balise4.setMoveStrategy(new SinusoidalStrategy(2, 20, 650, 0.45, 0, LARGEUR_FENETRE));
         balise4.setNom("La Bretagne");
 
         // Balise 5 : Déplacement horizontal (démarre vers la gauche, direction=-1)

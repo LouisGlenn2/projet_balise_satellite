@@ -1,12 +1,11 @@
 package balise;
 
-import java.util.Random;
-
 import announcer.Announcer;
-import strategy.*;
+import java.util.Random;
 import observer.*;
 import satellite.Satellite;
 import satellite.SatelliteState;
+import strategy.*;
 
 public class Balise {
     private int x, y;
@@ -150,11 +149,12 @@ public class Balise {
         // Reprendre la collecte
         this.state = BaliseState.Collect;
         this.memory = 0;
-        this.moveStrategy= this.savedStrategy;
+        System.out.println(this.y);
+        //this.moveStrategy= this.savedStrategy;
 
         // Nouveau seuil aléatoire pour la prochaine collecte
         Random rand = new Random();
-        this.maxMemory = 530 + rand.nextInt(71);
+        this.maxMemory = 130 + rand.nextInt(71);
 
         announcer.announce(new BaliseMoveEvent(this));
     }
