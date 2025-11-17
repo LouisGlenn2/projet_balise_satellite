@@ -1,7 +1,6 @@
 package observer;
 
 import announcer.AbstractEvent;
-import observer.SatelliteListener;
 
 public class SatelliteMoveEvent extends AbstractEvent{
 

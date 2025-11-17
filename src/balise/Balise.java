@@ -7,17 +7,44 @@ import satellite.Satellite;
 import satellite.SatelliteState;
 import strategy.*;
 
+/**
+ * Représente une balise sous-marine autonome capable de collecter des données,
+ * remonter en surface pour synchroniser avec un satellite, puis redescendre.
+ * 
+ * <p>La balise suit un cycle de vie en plusieurs phases :</p>
+ * <ul>
+ *   <li><b>Collect</b> : Collecte de données en profondeur</li>
+ *   <li><b>Remontee</b> : Remontée vers la surface lorsque la mémoire est pleine</li>
+ *   <li><b>WaitSynchro</b> : Attente d'un satellite en surface</li>
+ *   <li><b>Synchro</b> : Synchronisation des données avec un satellite</li>
+ *   <li><b>Redescente</b> : Retour à la profondeur d'origine pour reprendre la collecte</li>
+ * </ul>
+ * 
+ * <p>La balise utilise le pattern Strategy pour définir son comportement de déplacement
+ * et le pattern Observer pour notifier les changements d'état.</p>
+ * 
+ * @author [Votre nom]
+ * @version 1.0
+ */
 public class Balise {
     private int x, y;
-    private int direction,profondeurOrigine;
+    private int direction, profondeurOrigine;
     private MoveStrategy moveStrategy;
-    private MoveStrategy savedStrategy; // Pour sauvegarder la stratégie de collecte
+    private MoveStrategy savedStrategy;
     private Announcer announcer;
     private BaliseState state;
     private int memory;
-    private int maxMemory; 
-    private String nom;
+    private int maxMemory;
+    private String name;
     
+    /**
+     * Construit une nouvelle balise à la position spécifiée.
+     * 
+     * @param x La coordonnée horizontale initiale
+     * @param y La coordonnée verticale initiale (profondeur). 
+     *          Sera automatiquement ajustée à un minimum de 400 pour éviter la surface.
+     * @param direction La direction initiale de déplacement
+     */
     public Balise(int x, int y, int direction) {
         this.x = x;
         this.y = Math.max(400, y);
@@ -25,76 +52,93 @@ public class Balise {
         this.announcer = new Announcer();
         this.state = BaliseState.Collect;
         this.memory = 0;
-        this.profondeurOrigine=this.y;
+        this.profondeurOrigine = this.y;
        
         Random rand = new Random();
         this.maxMemory = 50 + rand.nextInt(171); 
     }
 
+    /**
+     * Définit la stratégie de déplacement de la balise.
+     * La stratégie est également sauvegardée pour être restaurée après synchronisation.
+     * 
+     * @param strategy La stratégie de mouvement à appliquer
+     */
     public void setMoveStrategy(MoveStrategy strategy) {
         this.moveStrategy = strategy;
-        this.savedStrategy=strategy;
+        this.savedStrategy = strategy;
     }
 
-    public void deplacer() {
+    /**
+     * Effectue un déplacement de la balise selon son état actuel et sa stratégie.
+     * 
+     * <p>Comportement selon l'état :</p>
+     * <ul>
+     *   <li><b>Collect</b> : Se déplace selon la stratégie, incrémente la mémoire, 
+     *       déclenche la remontée si la mémoire est pleine</li>
+     *   <li><b>Remontee</b> : Monte vers la surface, passe en attente de synchro à l'arrivée</li>
+     *   <li><b>WaitSynchro</b> : Reste immobile en surface</li>
+     *   <li><b>Synchro</b> : Reste immobile pendant la synchronisation</li>
+     *   <li><b>Redescente</b> : Redescend vers la profondeur d'origine</li>
+     * </ul>
+     * 
+     * <p>Notifie les observateurs à chaque déplacement via un {@link BaliseMoveEvent}.</p>
+     */
+    public void move() {
         if (state == BaliseState.Collect && moveStrategy != null) {
-            // Phase de collecte normale
             moveStrategy.move(this);
             announcer.announce(new BaliseMoveEvent(this));
             memory++;
 
-            // Quand la mémoire atteint le max → début de la remontée
             if (memory >= maxMemory) {
                 startRemontee();
                 System.out.println("Collecte Fini montée");
             }
         } 
         else if (state == BaliseState.Remontee) {
-            // Phase de remontée vers la surface
             moveStrategy.move(this);
             announcer.announce(new BaliseMoveEvent(this));
 
-            // Vérifier si arrivée en surface
             if (this.y <= 405) {
-                arriveeSurface();
+            	ArrivalSurface();
             }
         }
         else if (state == BaliseState.WaitSynchro) {
-            // En attente immobile - appliquer quand même la stratégie pour rester immobile
             if (moveStrategy != null) {
                 moveStrategy.move(this);
                 announcer.announce(new BaliseMoveEvent(this));
             }
         }
         else if (state == BaliseState.Synchro) {
-            // En cours de synchro - rester immobile
             if (moveStrategy != null) {
                 moveStrategy.move(this);
                 announcer.announce(new BaliseMoveEvent(this));
             }
         }
         else if (state == BaliseState.redescente) {
-            // Phase de redescente après synchronisation
             System.out.println("Synchro Fini redescente");
-            redescendre();
+            GoBackDown();
         }
     }
 
     /**
-     * Démarre la phase de remontée
+     * Démarre la phase de remontée vers la surface.
+     * Change l'état en Remontee et applique une stratégie de déplacement vertical ascendant.
      */
     private void startRemontee() {
         this.state = BaliseState.Remontee;       
-        this.moveStrategy = new VerticalUpStrategy(this.x,3,400,this.y );
+        this.moveStrategy = new VerticalUpStrategy(this.x, 3, 400, this.y);
         this.direction = 1; 
         
         announcer.announce(new BaliseMoveEvent(this));
     }
 
     /**
-     * Appelée quand la balise arrive en surface
+     * Gère l'arrivée de la balise en surface.
+     * Fixe la position à la surface (y=400), passe en état d'attente de synchronisation
+     * et applique une stratégie immobile.
      */
-    private void arriveeSurface() {
+    private void ArrivalSurface() {
         this.y = 400; 
         this.state = BaliseState.WaitSynchro;
         
@@ -104,12 +148,24 @@ public class Balise {
     }
 
     /**
-     * Tente une synchronisation avec un satellite
+     * Tente une synchronisation avec un satellite donné.
+     * 
+     * <p>La synchronisation réussit si :</p>
+     * <ul>
+     *   <li>La balise est en état WaitSynchro</li>
+     *   <li>Le satellite est libre (état Libre)</li>
+     *   <li>La distance horizontale entre la balise et le satellite est inférieure à 60 unités</li>
+     * </ul>
+     * 
+     * <p>En cas de succès, change l'état de la balise en Synchro, notifie les observateurs,
+     * met le satellite en état Synchro, puis termine automatiquement la synchronisation.</p>
+     * 
+     * @param sat Le satellite avec lequel tenter la synchronisation
      */
     public void trySynchronize(Satellite sat) {
         if (this.state == BaliseState.WaitSynchro && sat.getState() == SatelliteState.Libre && Math.abs(this.x - sat.getX()) < 60) {
             
-            System.out.println("Synchro " + this.getNom() + " <-> " + sat.getNom());
+            System.out.println("Synchro " + this.getName() + " <-> " + sat.getName());
             
             this.state = BaliseState.Synchro;
             announcer.announce(new BaliseSynchroEvent(this));
@@ -122,7 +178,10 @@ public class Balise {
     }
     
     /**
-     * Termine la synchronisation et prépare la redescente
+     * Termine la synchronisation et prépare la balise pour la redescente.
+     * Change l'état de la balise en Redescente et libère le satellite.
+     * 
+     * @param sat Le satellite à libérer
      */
     private void endSynchronization(Satellite sat) {
         this.state = BaliseState.redescente;
@@ -130,32 +189,39 @@ public class Balise {
     }
 
     /**
-     * Redescend et reprend la collecte
+     * Effectue la redescente de la balise vers sa profondeur d'origine.
+     * 
+     * <p>Applique une stratégie de descente verticale jusqu'à atteindre la profondeur d'origine + 10.
+     * Une fois la profondeur atteinte, restaure l'état de collecte, réinitialise la mémoire,
+     * restaure la stratégie de mouvement d'origine et génère un nouveau seuil de mémoire aléatoire
+     * (entre 130 et 200).</p>
      */
-    private void redescendre() {
-        // Restaurer la stratégie de collecte sauvegardée
+    private void GoBackDown() {
         if (savedStrategy != null) {
-            Random rand = new Random();
-            this.moveStrategy = new VerticalDownStrategy(this.x, 3, 1, profondeurOrigine+10);
+            this.moveStrategy = new VerticalDownStrategy(this.x, 3, 1, profondeurOrigine + 10);
             moveStrategy.move(this);
             announcer.announce(new BaliseMoveEvent(this));
         }
         
-        if(this.y >= this.profondeurOrigine) {
-        // Reprendre la collecte
-        this.state = BaliseState.Collect;
-        this.memory = 0;
-        System.out.println(this.y); 
-        this.moveStrategy= this.savedStrategy;
+        if (this.y >= this.profondeurOrigine) {
+            this.state = BaliseState.Collect;
+            this.memory = 0;
+            System.out.println(this.y); 
+            this.moveStrategy = this.savedStrategy;
 
-        // Nouveau seuil aléatoire pour la prochaine collecte
-        Random rand = new Random();
-        this.maxMemory = 130 + rand.nextInt(71);
+            Random rand = new Random();
+            this.maxMemory = 130 + rand.nextInt(71);
 
-        announcer.announce(new BaliseMoveEvent(this));
+            announcer.announce(new BaliseMoveEvent(this));
         }
     }
 
+    /**
+     * Enregistre un observateur pour les événements de déplacement et de synchronisation.
+     * 
+     * @param observer L'objet observateur à enregistrer pour les événements
+     *                 {@link BaliseMoveEvent} et {@link BaliseSynchroEvent}
+     */
     public void registerMoveEvent(Object observer) {
         this.announcer.register(observer, BaliseMoveEvent.class);
         this.announcer.register(observer, BaliseSynchroEvent.class);
@@ -166,6 +232,7 @@ public class Balise {
         this.y = Math.max(400, y); 
     }
     
+
     public int getX() {
         return x;
     }
@@ -174,6 +241,7 @@ public class Balise {
         this.x = x;
     }
     
+
     public int getY() {
         return y;
     }
@@ -206,11 +274,11 @@ public class Balise {
         return maxMemory; 
     }
 
-    public void setNom(String n){
-        this.nom = n; 
+    public void setName(String n) {
+        this.name = n; 
     }
-
-    public String getNom(){
-        return nom;
+    
+    public String getName() {
+        return name;
     }
 }

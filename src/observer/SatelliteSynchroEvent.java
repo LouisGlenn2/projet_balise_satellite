@@ -11,7 +11,6 @@ public class SatelliteSynchroEvent extends AbstractEvent{
 
 	public SatelliteSynchroEvent(Object source) {
 		super(source);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override

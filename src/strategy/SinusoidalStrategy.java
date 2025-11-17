@@ -3,37 +3,37 @@ package strategy;
 import balise.Balise;
 
 public class SinusoidalStrategy implements MoveStrategy {
-    private int vitesseX;       
+    private int SpeedX;       
     private int amplitude;     
-    private int profondeurCentrale;
+    private int Centraldepth;
     private double frequency; 
     private int time;          
-    private int limiteGauche;
-    private int limiteDroite;
+    private int LeftLimit;
+    private int RightLimit;
 
-    public SinusoidalStrategy(int vitesseX, int amplitude, int profondeurCentrale, 
-                             double frequency, int limiteGauche, int limiteDroite) {
-        this.vitesseX = vitesseX;
+    public SinusoidalStrategy(int SpeedX, int amplitude, int Centraldepth, 
+                             double frequency, int LeftLimit, int RightLimit) {
+        this.SpeedX = SpeedX;
         this.amplitude = amplitude;
-        this.profondeurCentrale = Math.max(400 + amplitude, profondeurCentrale);
+        this.Centraldepth = Math.max(400 + amplitude, Centraldepth);
         this.frequency = frequency;
         this.time = 0;
-        this.limiteGauche = limiteGauche;
-        this.limiteDroite = limiteDroite;
+        this.LeftLimit = LeftLimit;
+        this.RightLimit = RightLimit;
     }
     
     @Override
     public void move(Balise balise) {
         time++;
         
-        int newX = balise.getX() + (vitesseX * balise.getDirection());
+        int newX = balise.getX() + (SpeedX * balise.getDirection());
         
-        if (newX <= limiteGauche || newX >= limiteDroite) {
+        if (newX <= LeftLimit || newX >= RightLimit) {
             balise.setDirection(balise.getDirection() * -1);
-            newX = balise.getX() + (vitesseX * balise.getDirection());
+            newX = balise.getX() + (SpeedX * balise.getDirection());
         }
         
-        int newY = (int) (profondeurCentrale + Math.sin(time * frequency) * amplitude);
+        int newY = (int) (Centraldepth + Math.sin(time * frequency) * amplitude);
         
         newY = Math.max(400, newY);
         
