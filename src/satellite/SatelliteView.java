@@ -8,9 +8,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import cercle.Circle;
 import observer.*;
+import src.nicellipse.component.NiEllipse;
 import src.nicellipse.component.NiImage;
 import src.nicellipse.component.NiRectangle;
+import src.nicellipse.component.NiSpace;
 
 /**
  * Vue graphique d'un satellite en orbite.
@@ -26,22 +29,19 @@ import src.nicellipse.component.NiRectangle;
  * </ul>
  * 
  * <p>La vue implémente un système de défilement horizontal cyclique : lorsque le satellite
- * atteint le bord droit de l'écran, il réapparaît sur le bord gauche (effet "wrap-around").</p>
+ * atteint le bord droit de l'écran, il réapparaît à gauche (effet "wrap-around").</p>
  * 
  * <p>La vue superpose une image de satellite (satellite.png) sur un rectangle coloré
  * pour indiquer visuellement l'état actuel.</p>
  * 
- * @author [Votre nom]
- * @version 1.0
- * @see Satellite
- * @see SatelliteListener
- * @see SatelliteState
  */
 public class SatelliteView extends NiRectangle implements SatelliteListener {
 
     private static final long serialVersionUID = 1L;
     private Satellite mobi;
     private NiImage imageLayer;
+    private Circle signalSynchro;
+    private NiEllipse signalView;
 
     /**
      * Construit une nouvelle vue pour le satellite spécifié.
@@ -67,6 +67,18 @@ public class SatelliteView extends NiRectangle implements SatelliteListener {
             this.add(imageLayer);
             this.setDimension(new Dimension(rawImage.getWidth(), rawImage.getHeight()));
         }
+        
+        // Initialiser les cercles (mais ne pas les afficher)
+        int satelliteWidth = rawImage != null ? rawImage.getWidth() : 73;
+        int satelliteHeight = rawImage != null ? rawImage.getHeight() : 51;
+        int signalSize = 340;
+        
+        // Calculer la position des cercles pour qu'ils soient centrés sur le satellite
+        int circleOffsetX = -(signalSize - satelliteWidth) / 2;
+        int circleOffsetY = -(signalSize - satelliteHeight) / 2;
+        
+        signalSynchro = new Circle(circleOffsetX, circleOffsetY);
+        signalSynchro.setVisible(false);
     }
 
     /**
@@ -110,8 +122,8 @@ public class SatelliteView extends NiRectangle implements SatelliteListener {
      */
     @Override
     public void SattelliteSynchroEvent(SatelliteSynchroEvent event) {
-        //Circle.setvisible(true);
         updateColor();
+        updateSignalVisibility();
     }
 
     /**
@@ -132,10 +144,55 @@ public class SatelliteView extends NiRectangle implements SatelliteListener {
                 this.setBackground(Color.WHITE);
                 this.setOpaque(false);
                 this.setBorder(null);
+                hideSignal();
                 break;
             case Synchro:
                 this.setBackground(Color.BLUE);
+                showSignal();
                 break;
+        }
+    }
+    
+    /**
+     * Affiche les cercles de signal autour du satellite.
+     */
+    private void showSignal() {
+        if (signalView == null && this.getParent()!=null) {
+        	signalSynchro.setVisible(true);
+            signalView = signalSynchro.createSignal();
+            
+            if (signalView != null) {
+                int absoluteX = this.getX() + signalSynchro.getX();
+                int absoluteY = this.getY() + signalSynchro.getY();
+                signalView.setLocation(absoluteX, absoluteY);
+                NiSpace space = (NiSpace) this.getParent();
+                space.add(signalView, 0); 
+                space.repaint();
+            }
+        }
+    }
+    
+    /**
+     * Masque les cercles de signal.
+     */
+    private void hideSignal() {
+        if (signalView != null && this.getParent() !=null) {
+            NiSpace space = (NiSpace) this.getParent();
+            space.remove(signalView);
+            space.repaint();
+            signalView = null;
+            signalSynchro.setVisible(false);
+        }
+    }
+    
+    /**
+     * Met à jour la visibilité du signal selon l'état du satellite.
+     */
+    private void updateSignalVisibility() {
+        if (mobi.getState() == SatelliteState.Synchro) {
+            showSignal();
+        } else {
+            hideSignal();
         }
     }
 }

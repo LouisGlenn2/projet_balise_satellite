@@ -11,7 +11,6 @@ public class BaliseSynchroEvent extends AbstractEvent{
 
 	public BaliseSynchroEvent(Object source) {
 		super(source);
-		// TODO Auto-generated constructor stub
 	}
 	
     @Override

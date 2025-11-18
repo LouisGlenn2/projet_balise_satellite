@@ -6,9 +6,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import src.nicellipse.component.NiRectangle;
-import src.nicellipse.component.NiImage;
+
+import cercle.Circle;
 import observer.*;
+import src.nicellipse.component.NiEllipse;
+import src.nicellipse.component.NiImage;
+import src.nicellipse.component.NiRectangle;
+import src.nicellipse.component.NiSpace;
 
 /**
  * Vue graphique d'une balise sous-marine.
@@ -29,20 +33,14 @@ import observer.*;
  * <p>La vue superpose une image de balise (balise.png) sur un rectangle coloré
  * pour indiquer visuellement l'état actuel.</p>
  * 
- * @author [Votre nom]
- * @version 1.0
- * @see Balise
- * @see BaliseListener
- * @see BaliseState
  */
 public class BaliseView extends NiRectangle implements BaliseListener {
     
     private static final long serialVersionUID = 1L;
-    
- 
     private Balise balise;
-    
     private NiImage imageLayer;
+    private Circle signalSynchro;
+    private NiEllipse signalView;
     
     /**
      * Construit une nouvelle vue pour la balise spécifiée.
@@ -73,6 +71,18 @@ public class BaliseView extends NiRectangle implements BaliseListener {
             this.setDimension(new Dimension(rawImage.getWidth(), rawImage.getHeight()));
         }
         this.setLocation(balise.getX(), balise.getY());
+        
+        // Initialiser les cercles (mais ne pas les afficher)
+        int baliseWidth = rawImage != null ? rawImage.getWidth() : 110;
+        int baliseHeight = rawImage != null ? rawImage.getHeight() : 58;
+        int signalSize = 340;
+        
+        // Calculer la position des cercles pour qu'ils soient centrés sur la balise
+        int circleOffsetX = -(signalSize - baliseWidth) / 2;
+        int circleOffsetY = -(signalSize - baliseHeight) / 2;
+        
+        signalSynchro = new Circle(circleOffsetX, circleOffsetY);
+        signalSynchro.setVisible(false);
     }
     
     /**
@@ -90,10 +100,17 @@ public class BaliseView extends NiRectangle implements BaliseListener {
         int y = source.getY();
         
         this.setLocation(x, y);
+        
+        // Mettre à jour la position des cercles si ils sont affichés
+        if (signalView != null && this.getParent() != null) {
+            int absoluteX = x + signalSynchro.getX();
+            int absoluteY = y + signalSynchro.getY();
+            signalView.setLocation(absoluteX, absoluteY);
+        }
+        
         updateColor();
     }
     
-
     public Balise getBalise() {
         return balise;
     }
@@ -118,18 +135,23 @@ public class BaliseView extends NiRectangle implements BaliseListener {
             case Collect:
                 this.setOpaque(false);
                 this.setBackground(new Color(0, 0, 0, 0));
+                hideSignal();
                 break;
             case Remontee:
                 this.setBackground(new Color(135, 206, 250)); 
+                hideSignal();
                 break;
             case WaitSynchro:
                 this.setBackground(Color.ORANGE);
+                hideSignal();
                 break;
             case Synchro:
                 this.setBackground(Color.GREEN);
+                showSignal();
                 break;
             case redescente:
                 this.setBackground(Color.CYAN);
+                hideSignal();
                 break;
         }
     }
@@ -144,7 +166,39 @@ public class BaliseView extends NiRectangle implements BaliseListener {
      */
     @Override
     public void SynchroBalise(BaliseSynchroEvent event) {
-        Balise source = (Balise) event.getSource();
         updateColor();
+    }
+    
+    /**
+     * Affiche les cercles de signal autour de la balise.
+     */
+    private void showSignal() {
+        if (signalView == null && this.getParent() != null) {
+        	signalSynchro.setVisible(true);
+            signalView = signalSynchro.createSignal();
+            
+            if (signalView != null) {
+              
+                int absoluteX = this.getX() + signalSynchro.getX();
+                int absoluteY = this.getY() + signalSynchro.getY();
+                signalView.setLocation(absoluteX, absoluteY);
+                NiSpace space = (NiSpace) this.getParent();
+                space.add(signalView, 0); 
+                space.repaint();
+            }
+        }
+    }
+    
+    /**
+     * Masque les cercles de signal.
+     */
+    private void hideSignal() {
+        if (signalView != null && this.getParent() != null) {
+            NiSpace space = (NiSpace) this.getParent();
+            space.remove(signalView);
+            space.repaint();
+            signalView = null;
+            signalSynchro.setVisible(false);
+        }
     }
 }

@@ -17,7 +17,6 @@ public class Main {
     
     public static void main(String[] args) throws InterruptedException, IOException {
         int LARGEUR_FENETRE = 800;
-        //int SURFACE_MER = 400;
         
         NiSpace space = new NiSpace("Satellites et Balises", new Dimension(LARGEUR_FENETRE, 800));
         space.setBackground(new Color(135, 206, 250));

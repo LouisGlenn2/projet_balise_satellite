@@ -19,10 +19,6 @@ import observer.SatelliteSynchroEvent;
  * <p>Le satellite utilise le pattern Observer pour notifier les observateurs de ses déplacements
  * et de ses changements d'état.</p>
  * 
- * @author [Votre nom]
- * @version 1.0
- * @see SatelliteState
- * @see Satellite
  */
 public class Satellite {
     
@@ -31,8 +27,6 @@ public class Satellite {
     private int direction;
     Announcer announcer;
     private SatelliteState state;
-    private int synchroDuration;
-    private int synchroCounter;
     private String name;
     
     /**
@@ -51,8 +45,6 @@ public class Satellite {
         this.direction = direction;
         this.announcer = new Announcer();
         this.state = SatelliteState.Libre;
-        this.synchroDuration = 20000;
-        this.synchroCounter = 0;
     }
     
     /**
@@ -72,13 +64,7 @@ public class Satellite {
         if (state == SatelliteState.Libre) {
             this.x = this.x + (direction * gap);
             announcer.announce(new SatelliteMoveEvent(this));
-        } else if (state == SatelliteState.Synchro) {
-            synchroCounter++;
-            if (synchroCounter >= synchroDuration) {
-                this.state = SatelliteState.Libre;
-                synchroCounter = 0;
-            }
-        }
+        } 
     }
     
     /**

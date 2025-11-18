@@ -2,6 +2,9 @@ package balise;
 
 import announcer.Announcer;
 import java.util.Random;
+
+import javax.swing.Timer;
+
 import observer.*;
 import satellite.Satellite;
 import satellite.SatelliteState;
@@ -23,8 +26,6 @@ import strategy.*;
  * <p>La balise utilise le pattern Strategy pour définir son comportement de déplacement
  * et le pattern Observer pour notifier les changements d'état.</p>
  * 
- * @author [Votre nom]
- * @version 1.0
  */
 public class Balise {
     private int x, y;
@@ -173,7 +174,13 @@ public class Balise {
             sat.setState(SatelliteState.Synchro);
             sat.announceSynchro();
             
-            endSynchronization(sat);
+           Timer timer = new Timer(1000, e -> {
+                endSynchronization(sat);
+            });
+            timer.setRepeats(false);
+            timer.start();
+            
+            //endSynchronization(sat);
         }
     }
     

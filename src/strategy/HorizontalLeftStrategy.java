@@ -3,27 +3,27 @@ package strategy;
 import balise.Balise;
 
 public class HorizontalLeftStrategy implements MoveStrategy {
-    private int Fixeddepth;
-    private int SpeedX;
-    private int LeftLimit;
-    private int RightLimit;
+    private int fixeddepth;
+    private int speedX;
+    private int leftLimit;
+    private int rightLimit;
     
-    public HorizontalLeftStrategy(int Fixeddepth, int SpeedX, int LeftLimit, int RightLimit) {
-        this.Fixeddepth = Math.max(400, Fixeddepth);
-        this.SpeedX = Math.abs(SpeedX);
-        this.LeftLimit = LeftLimit;
-        this.RightLimit = RightLimit;
+    public HorizontalLeftStrategy(int fixeddepth, int speedX, int leftLimit, int rightLimit) {
+        this.fixeddepth = Math.max(400, fixeddepth);
+        this.speedX = Math.abs(speedX);
+        this.leftLimit = leftLimit;
+        this.rightLimit = rightLimit;
     }
     
     @Override
     public void move(Balise balise) {
-        balise.setY(Fixeddepth);
+        balise.setY(fixeddepth);
         
-        int newX = balise.getX() + (SpeedX * balise.getDirection());
+        int newX = balise.getX() + (speedX * balise.getDirection());
         
-        if (newX <= LeftLimit || newX >= RightLimit) {
+        if (newX <= leftLimit || newX >= rightLimit) {
             balise.setDirection(balise.getDirection() * -1);
-            newX = balise.getX() + (SpeedX * balise.getDirection());
+            newX = balise.getX() + (speedX * balise.getDirection());
         }
         
         balise.setX(newX);

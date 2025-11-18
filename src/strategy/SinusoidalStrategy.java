@@ -3,37 +3,37 @@ package strategy;
 import balise.Balise;
 
 public class SinusoidalStrategy implements MoveStrategy {
-    private int SpeedX;       
+    private int speedX;       
     private int amplitude;     
-    private int Centraldepth;
+    private int centralDepth;
     private double frequency; 
     private int time;          
-    private int LeftLimit;
-    private int RightLimit;
+    private int leftLimit;
+    private int rightLimit;
 
-    public SinusoidalStrategy(int SpeedX, int amplitude, int Centraldepth, 
-                             double frequency, int LeftLimit, int RightLimit) {
-        this.SpeedX = SpeedX;
+    public SinusoidalStrategy(int speedX, int amplitude, int centralDepth, 
+                             double frequency, int leftLimit, int rightLimit) {
+        this.speedX = speedX;
         this.amplitude = amplitude;
-        this.Centraldepth = Math.max(400 + amplitude, Centraldepth);
+        this.centralDepth = Math.max(400 + amplitude, centralDepth);
         this.frequency = frequency;
         this.time = 0;
-        this.LeftLimit = LeftLimit;
-        this.RightLimit = RightLimit;
+        this.leftLimit = leftLimit;
+        this.rightLimit = rightLimit;
     }
     
     @Override
     public void move(Balise balise) {
         time++;
         
-        int newX = balise.getX() + (SpeedX * balise.getDirection());
+        int newX = balise.getX() + (speedX * balise.getDirection());
         
-        if (newX <= LeftLimit || newX >= RightLimit) {
+        if (newX <= leftLimit || newX >= rightLimit) {
             balise.setDirection(balise.getDirection() * -1);
-            newX = balise.getX() + (SpeedX * balise.getDirection());
+            newX = balise.getX() + (speedX * balise.getDirection());
         }
         
-        int newY = (int) (Centraldepth + Math.sin(time * frequency) * amplitude);
+        int newY = (int) (centralDepth + Math.sin(time * frequency) * amplitude);
         
         newY = Math.max(400, newY);
         
